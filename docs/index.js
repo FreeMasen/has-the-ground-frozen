@@ -173,7 +173,7 @@ function setFrozen(isFrozen) {
         ANS.classList.add("no");
         ANS.classList.remove("yes");
     } else {
-        ANS.innerText = "????";
+        ANS.innerText = "?";
         ANS.classList.remove("no");
         ANS.classList.remove("yes");
     }

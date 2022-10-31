@@ -11,6 +11,17 @@
             h1 {
                 text-align: center;
             }
+            #station-form {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-between;
+            }
+            #state-group {
+                width: 75px;
+            }
+            #station-group {
+                width: calc(100% - 80px);
+            }
             #answer {
                 font-size: 10rem;
                 text-align: center;
@@ -38,17 +49,17 @@
         </header>
         <main>
             <form id="station-form">
-                <div>
+                <div id="state-group">
                     <label for="state-select">State</label>
                     <select id="state-select" name="state-select"></select>
                 </div>
-                <div>
+                <div id="station-group">
                     <label for="station-select">Station</label>
                     <select id="station-select" name="station-select"></select>
                 </div>
             </form>
             <div style="display:flex;flex-flow:column;align-items:center;">
-                <div id="answer">????</div>
+                <div id="answer">?</div>
                 <button id="check-now" type="button" onclick="getObservations()">Check Now</button>
             </div>
             <details>
