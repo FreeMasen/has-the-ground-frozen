@@ -12,12 +12,33 @@ const STATES = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
 const STATE_KEY = "saved-state";
 const STATION_KEY = "saved-station";
 
+STATE.addEventListener("change", async () => {
+    let state = getState();
+    if (!state || state.length == 0) {
+        localStorage.removeItem(STATE_KEY);
+    } else {
+        localStorage.setItem(STATE_KEY, state);
+    }
+    localStorage.removeItem(STATION_KEY);
+    await populateStations();
+});
+STATION.addEventListener("change", async () => {
+    let stationId = await getStationId(); 
+    if (!stationId || stationId.length == 0) {
+        localStorage.removeItem(STATION_KEY);
+        return;
+    }
+    localStorage.setItem(STATION_KEY, stationId);
+    await getObservations(stationId);
+});
+
 function createOpt(text, value) {
     let opt = document.createElement("option");
     opt.innerText = text;
     opt.value = value;
     return opt;
 }
+
 function populateStates() {
     while (STATE.hasChildNodes()) {
         STATE.removeChild(STATE.lastChild);
@@ -33,25 +54,20 @@ function populateStates() {
 function getState() {
     let state = STATE.selectedOptions[0]?.value;
     if (!state || state.length == 0) {
-        localStorage.removeItem(STATION_KEY);
+        localStorage.removeItem(STATE_KEY);
         return;
     }
+    localStorage.setItem(STATE_KEY, state);
     return state;
 }
 
-async function populateStations() {
-    let state = getState();
-    if (state !== localStorage.getItem(STATE_KEY)) {
-        localStorage.removeItem(STATION_KEY);
-    } else {
-        localStorage.setItem(STATE_KEY, state);
-    }
+async function populateStations(state) {
+    state = state || getState();
     setFrozen(null);
     while (STATION.hasChildNodes()) {
         STATION.removeChild(STATION.lastChild);
     }
     if (!state || state.length == 0) {
-        localStorage.removeItem(STATION_KEY);
         return;
     }
     let res = await fetch(encodeURI(`https://api.weather.gov/stations?state=${state}`));
@@ -81,12 +97,12 @@ async function populateStations() {
 }
 
 async function stationSelected() {
+    localStorage.setItem(STATION_KEY, stationId);
     setFrozen(null);
     let stationId = getStationId();
     if (!stationId) {
         return;
     }
-    localStorage.setItem(STATION_KEY, stationId);
     await getObservations();
 }
 
@@ -107,9 +123,15 @@ function getStationId() {
     }
     return stationId;
 }
-
-async function getObservations() {
+let timeoutId;
+function recursiveUpdate() {
+    ANS.innerText += ".";
+    timeoutId = setTimeout(recursiveUpdate, 500);
+}
+async function getObservations(stationId) {
+    stationId = stationId || getStationId();
     setFrozen(null);
+    recursiveUpdate();
     while (OL.hasChildNodes()) {
         OL.removeChild(OL.lastChild);
     }
@@ -141,6 +163,7 @@ async function getObservations() {
 }
 
 function setFrozen(isFrozen) {
+    clearTimeout(timeoutId);
     if (isFrozen == true) {
         ANS.innerText = "YES!"
         ANS.classList.add("yes");
@@ -166,7 +189,7 @@ populateStates();
         await populateStations();
         if (savedStation && savedStation.length > 0) {
             STATION.value = savedStation;
-            await getObservations();
+            await getObservations(savedStation);
         }
     }
 })().catch(console.error);
