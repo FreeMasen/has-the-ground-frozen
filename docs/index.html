@@ -40,6 +40,11 @@
             #check-now {
                 background-color: #B1B6B7;
             }
+            #observations-title.error::after,
+            #observations-title.error::before {
+                content: "!!!";
+                color: #E6534E;
+            }
         </style>
         <title>HTGF</title>
     </head>
@@ -49,13 +54,9 @@
         </header>
         <main>
             <form id="station-form">
-                <div id="state-group">
-                    <label for="state-select">State</label>
-                    <select id="state-select" name="state-select"></select>
-                </div>
-                <div id="station-group">
-                    <label for="station-select">Station</label>
-                    <select id="station-select" name="station-select"></select>
+                <div id="zip-group">
+                    <label for="zipcode">Zip Code</label>
+                    <input id="zipcode" name="zipcode" type="text" minlength="5" maxlength="5" ></input>
                 </div>
             </form>
             <div style="display:flex;flex-flow:column;align-items:center;">
@@ -63,10 +64,10 @@
                 <button id="check-now" type="button" onclick="getObservations()">Check Now</button>
             </div>
             <details>
-                <summary>Observations</summary>
+                <summary id="observations-title">Observations</summary>
                 <ul id="observations"></ul>
             </details>
         </main>
-       <script src="index.js" type="text/javascript"></script> 
+       <script src="index.js" type="module" async="true"></script> 
     </body>
 </html>
